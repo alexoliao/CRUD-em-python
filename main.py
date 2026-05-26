@@ -71,6 +71,81 @@ def adicionar_pessoa(crud):
         print(f"❌ Erro ao adicionar pessoa: {e}")
 
 
+def buscar_por_id(crud):
+    """Menu para buscar uma pessoa por ID."""
+    print("\n" + "=" * 50)
+    print("BUSCAR PESSOA POR ID")
+    print("=" * 50)
+    
+    try:
+        id_str = input("Digite o ID: ").strip()
+        id = int(id_str)
+        
+        pessoa = crud.buscar_por_id(id)
+        
+        if pessoa:
+            print(f"\n✅ Pessoa encontrada:")
+            print(f"   {pessoa}")
+        else:
+            print(f"❌ Nenhuma pessoa encontrada com ID {id}")
+            
+    except ValueError:
+        print("❌ Erro: ID deve ser um número inteiro!")
+    except Exception as e:
+        print(f"❌ Erro ao buscar: {e}")
+
+
+def buscar_por_cpf(crud):
+    """Menu para buscar uma pessoa por CPF."""
+    print("\n" + "=" * 50)
+    print("BUSCAR PESSOA POR CPF")
+    print("=" * 50)
+    
+    try:
+        cpf = input("Digite o CPF: ").strip()
+        
+        if not cpf:
+            print("❌ Erro: CPF não pode estar vazio!")
+            return
+        
+        pessoa = crud.buscar_por_cpf(cpf)
+        
+        if pessoa:
+            print(f"\n✅ Pessoa encontrada:")
+            print(f"   {pessoa}")
+        else:
+            print(f"❌ Nenhuma pessoa encontrada com CPF {cpf}")
+            
+    except Exception as e:
+        print(f"❌ Erro ao buscar: {e}")
+
+
+def buscar_por_nome(crud):
+    """Menu para buscar pessoas por nome."""
+    print("\n" + "=" * 50)
+    print("BUSCAR PESSOA POR NOME")
+    print("=" * 50)
+    
+    try:
+        nome = input("Digite o nome (ou parte do nome): ").strip()
+        
+        if not nome:
+            print("❌ Erro: Nome não pode estar vazio!")
+            return
+        
+        pessoas = crud.buscar_por_nome(nome)
+        
+        if pessoas:
+            print(f"\n✅ {len(pessoas)} pessoa(s) encontrada(s):")
+            for pessoa in pessoas:
+                print(f"   {pessoa}")
+        else:
+            print(f"❌ Nenhuma pessoa encontrada com nome contendo '{nome}'")
+            
+    except Exception as e:
+        print(f"❌ Erro ao buscar: {e}")
+
+
 def menu_principal():
     """Menu principal do sistema."""
     crud = CRUDPessoa()
@@ -104,6 +179,12 @@ def menu_principal():
                 for pessoa in pessoas:
                     print(pessoa)
             print(f"Total: {crud.contar()} pessoa(s)")
+        elif opcao == "3":
+            buscar_por_id(crud)
+        elif opcao == "4":
+            buscar_por_cpf(crud)
+        elif opcao == "5":
+            buscar_por_nome(crud)
         elif opcao == "8":
             print("\n👋 Encerrando o sistema. Até logo!")
             break
