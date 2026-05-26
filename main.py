@@ -146,6 +146,87 @@ def buscar_por_nome(crud):
         print(f"❌ Erro ao buscar: {e}")
 
 
+def atualizar_pessoa(crud):
+    """Menu para atualizar dados de uma pessoa."""
+    print("\n" + "=" * 50)
+    print("ATUALIZAR PESSOA")
+    print("=" * 50)
+    
+    try:
+        # Busca a pessoa por ID
+        id_str = input("Digite o ID da pessoa a atualizar: ").strip()
+        id = int(id_str)
+        
+        pessoa = crud.buscar_por_id(id)
+        
+        if not pessoa:
+            print(f"❌ Nenhuma pessoa encontrada com ID {id}")
+            return
+        
+        print(f"\n📋 Dados atuais:")
+        print(f"   {pessoa}")
+        
+        # Menu de campos a atualizar
+        print(f"\n📝 Escolha o que atualizar (deixe em branco para não alterar):")
+        
+        novo_nome = input("Novo nome (ou pressione Enter para manter): ").strip()
+        novo_cpf = input("Novo CPF (ou pressione Enter para manter): ").strip()
+        
+        nova_idade = None
+        idade_input = input("Nova idade (ou pressione Enter para manter): ").strip()
+        if idade_input:
+            nova_idade = validar_idade(idade_input)
+            if nova_idade is None:
+                print("❌ Erro: Idade deve ser um número entre 0 e 150!")
+                return
+        
+        novo_email = input("Novo email (ou pressione Enter para manter): ").strip()
+        novo_telefone = input("Novo telefone (ou pressione Enter para manter): ").strip()
+        
+        # Valida CPF se foi fornecido
+        if novo_cpf and not validar_cpf(novo_cpf):
+            print("❌ Erro: CPF inválido! Use o formato correto.")
+            return
+        
+        # Valida email se foi fornecido
+        if novo_email and "@" not in novo_email:
+            print("❌ Erro: Email inválido!")
+            return
+        
+        # Prepara dados para atualizar (apenas campos não vazios)
+        kwargs = {}
+        if novo_nome:
+            kwargs['nome'] = novo_nome
+        if novo_cpf:
+            kwargs['cpf'] = novo_cpf
+        if nova_idade is not None:
+            kwargs['idade'] = nova_idade
+        if novo_email:
+            kwargs['email'] = novo_email
+        if novo_telefone:
+            kwargs['telefone'] = novo_telefone
+        
+        # Se nenhum campo foi preenchido
+        if not kwargs:
+            print("⚠️  Nenhum campo foi alterado.")
+            return
+        
+        # Atualiza a pessoa
+        if crud.atualizar(id, **kwargs):
+            print(f"\n✅ Pessoa atualizada com sucesso!")
+            pessoa_atualizada = crud.buscar_por_id(id)
+            print(f"   {pessoa_atualizada}")
+        else:
+            print(f"❌ Erro ao atualizar pessoa.")
+            
+    except ValueError:
+        print("❌ Erro: ID deve ser um número inteiro!")
+    except ValueError as e:
+        print(f"❌ {e}")
+    except Exception as e:
+        print(f"❌ Erro ao atualizar: {e}")
+
+
 def menu_principal():
     """Menu principal do sistema."""
     crud = CRUDPessoa()
@@ -185,6 +266,8 @@ def menu_principal():
             buscar_por_cpf(crud)
         elif opcao == "5":
             buscar_por_nome(crud)
+        elif opcao == "6":
+            atualizar_pessoa(crud)
         elif opcao == "8":
             print("\n👋 Encerrando o sistema. Até logo!")
             break
