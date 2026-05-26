@@ -71,6 +71,63 @@ def adicionar_pessoa(crud):
         print(f"❌ Erro ao adicionar pessoa: {e}")
 
 
+def listar_pessoas(crud):
+    """Menu para listar pessoas com opções de limite."""
+    print("\n" + "=" * 50)
+    print("LISTAR PESSOAS")
+    print("=" * 50)
+    
+    while True:
+        print("\n1. Listar todas as pessoas")
+        print("2. Listar primeiras X pessoas")
+        print("3. Voltar ao menu principal")
+        
+        opcao = input("\nEscolha uma opção: ").strip()
+        
+        if opcao == "1":
+            print("\n" + "=" * 50)
+            print("TODAS AS PESSOAS")
+            print("=" * 50)
+            pessoas = crud.listar_todos()
+            if not pessoas:
+                print("Nenhuma pessoa cadastrada.")
+            else:
+                for i, pessoa in enumerate(pessoas, 1):
+                    print(f"{i}. {pessoa}")
+            print(f"\nTotal: {crud.contar()} pessoa(s)")
+            
+        elif opcao == "2":
+            try:
+                limite_str = input("\nDigite a quantidade de pessoas a listar: ").strip()
+                limite = int(limite_str)
+                
+                if limite <= 0:
+                    print("❌ Erro: A quantidade deve ser maior que 0!")
+                    continue
+                
+                pessoas = crud.listar_com_limite(limite)
+                
+                print("\n" + "=" * 50)
+                print(f"PRIMEIRAS {limite} PESSOAS")
+                print("=" * 50)
+                
+                if not pessoas:
+                    print("Nenhuma pessoa cadastrada.")
+                else:
+                    for i, pessoa in enumerate(pessoas, 1):
+                        print(f"{i}. {pessoa}")
+                
+                print(f"\nTotal exibido: {len(pessoas)} de {crud.contar()} pessoa(s)")
+                
+            except ValueError:
+                print("❌ Erro: Digite um número válido!")
+                
+        elif opcao == "3":
+            break
+        else:
+            print("❌ Opção inválida! Tente novamente.")
+
+
 def buscar_por_id(crud):
     """Menu para buscar uma pessoa por ID."""
     print("\n" + "=" * 50)
@@ -219,12 +276,47 @@ def atualizar_pessoa(crud):
         else:
             print(f"❌ Erro ao atualizar pessoa.")
             
-    except ValueError:
-        print("❌ Erro: ID deve ser um número inteiro!")
     except ValueError as e:
         print(f"❌ {e}")
     except Exception as e:
         print(f"❌ Erro ao atualizar: {e}")
+
+
+def deletar_pessoa(crud):
+    """Menu para deletar uma pessoa."""
+    print("\n" + "=" * 50)
+    print("DELETAR PESSOA")
+    print("=" * 50)
+    
+    try:
+        # Busca a pessoa por ID
+        id_str = input("Digite o ID da pessoa a deletar: ").strip()
+        id = int(id_str)
+        
+        pessoa = crud.buscar_por_id(id)
+        
+        if not pessoa:
+            print(f"❌ Nenhuma pessoa encontrada com ID {id}")
+            return
+        
+        print(f"\n📋 Dados da pessoa a ser deletada:")
+        print(f"   {pessoa}")
+        
+        # Confirmar deleção
+        confirmacao = input("\n⚠️  Tem certeza que deseja deletar? (S/N): ").strip().upper()
+        
+        if confirmacao == "S":
+            if crud.deletar(id):
+                print(f"\n✅ Pessoa deletada com sucesso!")
+            else:
+                print(f"❌ Erro ao deletar pessoa.")
+        else:
+            print("❌ Deleção cancelada.")
+            
+    except ValueError:
+        print("❌ Erro: ID deve ser um número inteiro!")
+    except Exception as e:
+        print(f"❌ Erro ao deletar: {e}")
 
 
 def menu_principal():
@@ -250,16 +342,7 @@ def menu_principal():
         if opcao == "1":
             adicionar_pessoa(crud)
         elif opcao == "2":
-            print("\n" + "=" * 50)
-            print("LISTAR TODAS AS PESSOAS")
-            print("=" * 50)
-            pessoas = crud.listar_todos()
-            if not pessoas:
-                print("Nenhuma pessoa cadastrada.")
-            else:
-                for pessoa in pessoas:
-                    print(pessoa)
-            print(f"Total: {crud.contar()} pessoa(s)")
+            listar_pessoas(crud)
         elif opcao == "3":
             buscar_por_id(crud)
         elif opcao == "4":
@@ -268,6 +351,8 @@ def menu_principal():
             buscar_por_nome(crud)
         elif opcao == "6":
             atualizar_pessoa(crud)
+        elif opcao == "7":
+            deletar_pessoa(crud)
         elif opcao == "8":
             print("\n👋 Encerrando o sistema. Até logo!")
             break
